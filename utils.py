@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 
@@ -124,6 +125,16 @@ class PixelTracker(QWidget):
             pixel_color = pyautogui.pixel(x, y)
             hex_color = "#%02x%02x%02x" % pixel_color
             print(f"Position: ({x}, {y}), Color: {hex_color}")
+            
+            # Save pixel data to file
+            output_dir = resource_path("output")
+            os.makedirs(output_dir, exist_ok=True)
+            output_file = os.path.join(output_dir, "pixel_data.txt")
+
+            with open(output_file, "a") as f:
+                f.write(f"Position: ({x}, {y}), Color: {hex_color}\n") 
+
+            print(f"Pixel data appended to {output_file}")
 
 class Regioner(QtWidgets.QWidget):
     def __init__(self, parent=None, flags=Qt.WindowFlags()):
@@ -206,7 +217,18 @@ class Regioner(QtWidgets.QWidget):
         
         # Print the x_region information
         print(f"  * self.x_region = ({x1}, {y1}, {width}, {height})")  # New line
+        output_dir = resource_path("output")  # Directory to save the file
+        os.makedirs(output_dir, exist_ok=True)  # Create the directory if it doesn't exist
+        output_file = os.path.join(output_dir, "region_data.txt")
 
+        with open(output_file, "a") as f:
+            f.write(f"Top-left corner: ({x1}, {y1})\n")
+            f.write(f"Bottom-right corner: ({x2}, {y2})\n")
+            f.write(f"Width: {width}\n")
+            f.write(f"Height: {height}\n")
+            f.write(f"self.x_region = ({x1}, {y1}, {width}, {height})\n\n")  # New line
+
+        print(f"Region data saved to {output_file}")
         self.close() 
 
         return super().mouseReleaseEvent(event)
@@ -293,6 +315,27 @@ class Snipper(QtWidgets.QWidget):
             print(f"Screenshot saved to {filepath}")
         self.close()  # Close the Snipper window after saving
 
+def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller."""
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = os.path.dirname(sys.executable) # For building with PyInstaller
+        # base_path = os.path.dirname(os.path.abspath(__file__)) # For running the script directly
+    except Exception:
+        base_path = os.path.dirname(os.path.abspath(sys.executable))
+        
+    return os.path.join(base_path, relative_path)
+
+
+def image_resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller."""
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = os.path.dirname(os.path.abspath(__file__)) 
+    except Exception:
+        base_path = os.path.dirname(sys.executable)
+        
+    return os.path.join(base_path, relative_path)
 class UtilityGUI(QWidget):
     def __init__(self):
         super().__init__()
@@ -332,13 +375,14 @@ class UtilityGUI(QWidget):
         self.layout.addWidget(close_button)
 
         # Set button icons
-        self.always_on_top_button.setIcon(QIcon(r"images\gui\on_top_icon.svg"))
+        self.always_on_top_button.setIcon(QIcon(image_resource_path(r"images\gui\on_top_icon.svg")))
         self.utility_buttons[0].setIcon(
-            QIcon(r"images\gui\pixel_color_icon.svg"))
-        self.utility_buttons[1].setIcon(QIcon(r"images\gui\region_icon.svg"))
+            QIcon(image_resource_path(r"images\gui\pixel_color_icon.svg")))
+        self.utility_buttons[1].setIcon(QIcon(image_resource_path(r"images\gui\region_icon.svg")))
         self.utility_buttons[2].setIcon(
-            QIcon(r"images\gui\screenshot_icon.svg"))
-        close_button.setIcon(QIcon(r"images\gui\close_icon.svg"))
+            QIcon(image_resource_path(r"images\gui\screenshot_icon.svg")))
+        close_button.setIcon(QIcon(image_resource_path(r"images\gui\close_icon.svg")))
+        self.setWindowIcon(QIcon(image_resource_path(r"images\icon.png")))
 
         # Connect button signals to functions
         # Connect the toggled signal to control the timer and button state
