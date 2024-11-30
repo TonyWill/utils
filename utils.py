@@ -302,6 +302,13 @@ class Snipper(QtWidgets.QWidget):
             y1 += 3
 
         screenshot = pyautogui.screenshot(region=(x1, y1, x2 - x1, y2 - y1))
+        
+        # Copy the screenshot to the clipboard
+        data = screenshot.tobytes("raw", "RGB")
+        qim = QtGui.QImage(data, x2 - x1, y2 - y1, QtGui.QImage.Format_RGB888)
+        pixmap = QtGui.QPixmap.fromImage(qim) 
+        clipboard = QtWidgets.QApplication.clipboard()
+        clipboard.setPixmap(pixmap) 
 
         options = QtWidgets.QFileDialog.Options()
         filepath, _ = QtWidgets.QFileDialog.getSaveFileName(
