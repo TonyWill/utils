@@ -2,7 +2,9 @@ import os
 import sys
 import time
 
+import cv2
 import keyboard
+import numpy as np
 import pyautogui
 import typer
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -303,10 +305,15 @@ class Snipper(QtWidgets.QWidget):
 
         screenshot = pyautogui.screenshot(region=(x1, y1, x2 - x1, y2 - y1))
         
-        # Copy the screenshot to the clipboard
-        data = screenshot.tobytes("raw", "RGB")
-        qim = QtGui.QImage(data, x2 - x1, y2 - y1, QtGui.QImage.Format_RGB888)
-        pixmap = QtGui.QPixmap.fromImage(qim) 
+        # Convert the PIL Image to QPixmap
+        # Convert the PIL Image to OpenCV format
+        open_cv_image = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+
+        # Convert from OpenCV to QPixmap
+        height, width, channel = open_cv_image.shape
+        bytesPerLine = 3 * width
+        qim = QtGui.QImage(open_cv_image.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888) 
+        pixmap = QtGui.QPixmap.fromImage(qim)
         clipboard = QtWidgets.QApplication.clipboard()
         clipboard.setPixmap(pixmap) 
 
