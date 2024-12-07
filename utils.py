@@ -127,6 +127,11 @@ class PixelTracker(QWidget):
             pixel_color = pyautogui.pixel(x, y)
             hex_color = "#%02x%02x%02x" % pixel_color
             print(f"Position: ({x}, {y}), Color: {hex_color}")
+            pixel_data = f"Position: ({x}, {y}), Color: {hex_color}"
+
+            # Copy region info to clipboard
+            clipboard = QtWidgets.QApplication.clipboard()
+            clipboard.setText(pixel_data)
             
             # Save pixel data to file
             output_dir = resource_path("output")
@@ -134,7 +139,7 @@ class PixelTracker(QWidget):
             output_file = os.path.join(output_dir, "pixel_data.txt")
 
             with open(output_file, "a") as f:
-                f.write(f"Position: ({x}, {y}), Color: {hex_color}\n") 
+                f.write(f"{pixel_data}\n") 
 
             print(f"Pixel data appended to {output_file}")
 
@@ -218,7 +223,13 @@ class Regioner(QtWidgets.QWidget):
         print(f"  * Height: {height}")
         
         # Print the x_region information
-        print(f"  * self.x_region = ({x1}, {y1}, {width}, {height})")  # New line
+        # Prepare region information
+        region_info = f"self.x_region = ({x1}, {y1}, {width}, {height})" 
+
+        # Copy region info to clipboard
+        clipboard = QtWidgets.QApplication.clipboard()
+        clipboard.setText(region_info)
+        print(region_info)  # New line
         output_dir = resource_path("output")  # Directory to save the file
         os.makedirs(output_dir, exist_ok=True)  # Create the directory if it doesn't exist
         output_file = os.path.join(output_dir, "region_data.txt")
@@ -228,7 +239,7 @@ class Regioner(QtWidgets.QWidget):
             f.write(f"Bottom-right corner: ({x2}, {y2})\n")
             f.write(f"Width: {width}\n")
             f.write(f"Height: {height}\n")
-            f.write(f"self.x_region = ({x1}, {y1}, {width}, {height})\n\n")  # New line
+            f.write(f"{region_info})\n\n")  # New line
 
         print(f"Region data saved to {output_file}")
         self.close() 
